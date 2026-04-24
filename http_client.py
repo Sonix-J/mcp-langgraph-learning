@@ -1,20 +1,16 @@
 import asyncio
 from mcp import ClientSession
-from mcp.client.stdio import stdio_client, StdioServerParameters
+from mcp.client.streamable_http import streamablehttp_client
 
 async def main():
-    # Create server parameters correctly
-    server_params = StdioServerParameters(
-        command="python",
-        args=["server.py"]
-    )
-    
-    async with stdio_client(server_params) as (read_stream, write_stream):
+    async with streamablehttp_client("http://127.0.0.1:8000/mcp") as (
+        read_stream, 
+        write_stream, 
+        _
+    ):  # ← 3 values: read_stream, write_stream, and a third one we ignore with _
         async with ClientSession(read_stream, write_stream) as session:
-            # Initialize the session
             await session.initialize()
             
-            # List available tools
             tools = await session.list_tools()
             print("Available tools:", tools)
             
